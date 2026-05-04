@@ -130,7 +130,7 @@ The following are concrete open questions where external perspective would be mo
 
 3. **Calibration at small folds** — isotonic regression collapsed for 5 of 7 per-symbol models (n_calib < 50). Would Platt scaling (logistic calibration) or beta calibration handle this more gracefully? Or should we simply enforce a minimum calibration-fold size and refuse to calibrate below it?
 
-4. **Honest out-of-sample evaluation** — 6 of 7 symbols' data was ingested in a ~3-day window, collapsing the chronological split to essentially random. What does a *real* out-of-sample evaluation look like? Options: (a) wait 30+ days for new data before evaluating, (b) use a different holdout strategy (symbol-level instead of time-based), (c) accept the caveat and treat current metrics as "in-sample-ish" placeholders.
+4. **Honest out-of-sample evaluation** — the chronological split now uses `breach_ts_utc` (commit `ab4c1910`), so future training runs are genuinely out-of-sample. The remaining open question: the 2026-05-04 pool-vs-baseline numbers were computed under the broken split and need to be regenerated under the fixed split before any promotion decision. After re-training, is a single time-based holdout sufficient, or should we additionally hold out by symbol (train on 6 symbols, validate on 1) to test cross-symbol generalisation?
 
 5. **Swing-level findings → breach-decision features** — the swing-level research (Phases 1–5) found a one-latent-factor ceiling at F1 ≈ 0.84 for SFP/Confirmed classification using breach-bar features. The breach-decision predictor uses a different set of 14 features (mostly level/ATR features, not breach-bar body/wick features). Is there a direct mapping? Specifically: `breach_body_beyond_atr` (the best swing-research SFP predictor) — can an equivalent be computed for LevelGuard's breach events in real time?
 
@@ -144,4 +144,4 @@ The following are concrete open questions where external perspective would be mo
 
 Every architecture doc and the shadow-mode runbook has a back-link to this index. The swing-levels tracker links here. The levelguard-analysis README links here. All cross-references use Obsidian wiki-links.
 
-*Last reviewed: 2026-05-04 — created as Map of Content for external-AI ingest.*
+*Last reviewed: 2026-05-04 — created as Map of Content for external-AI ingest; refreshed same-day to incorporate fork-child code fixes (commits `ab4c1910`, `749f0f5f`, `786165c5`): chronological-split fix (`breach_ts_utc`), calibrator-collapse guard, additional case-insensitive symbol sites, GLMUSDT decision closed.*

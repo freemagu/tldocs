@@ -246,4 +246,4 @@ adapt to regime changes faster. There is no free lunch.
 - `bin/breach-decision-retrain-trigger` — trigger CLI
 - `bin/breach-decision-health` — production data health
 
-*Last reviewed: 2026-05-04 — J2 and J9 status updated; pool training first run noted.*
+*Last reviewed: 2026-05-04 — J2 and J9 status updated; pool training first run noted; documented `--allow-small-calibration-fold` guard override (commit `ab4c1910`).*

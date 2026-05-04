@@ -207,4 +207,4 @@ full question.
 - `lib/tradelens/breach_decision/predictor.py` — predictor implementation
 - `bin/breach-decision-health` — production-data health CLI
 
-*Last reviewed: 2026-05-04 — updated for pool training, persisted metrics, and 3350 labelled rows.*
+*Last reviewed: 2026-05-04 — updated for pool training, persisted metrics, 3350 labelled rows, and the same-day chronological-split fix (`breach_ts_utc`) + calibrator-collapse guard (commit `ab4c1910`).*
