@@ -1,0 +1,223 @@
+{
+  "main": {
+    "id": "8beaca44ef986477",
+    "type": "split",
+    "children": [
+      {
+        "id": "a46839f70a324fee",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4fd7ca012494a1a3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "10-architecture/order-leg-classification.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "order-leg-classification"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "116e6a07036aa9d8",
+    "type": "split",
+    "children": [
+      {
+        "id": "8cb5741e238140be",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "428ddbf7107c9413",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": true
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "85285be4c5b416cb",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "cb5b052422e723c5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 463.5
+  },
+  "right": {
+    "id": "36d2a94c07a70737",
+    "type": "split",
+    "children": [
+      {
+        "id": "e832b9c5ab925d59",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ef644857ec095bc0",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "10-architecture/order-leg-classification.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for order-leg-classification"
+            }
+          },
+          {
+            "id": "817644f02bfb6d5a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "a5207af9bde8638e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "d92264fa3d1f2b41",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "02e99458cbfcd02c",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "4fd7ca012494a1a3",
+  "lastOpenFiles": [
+    "MOC.md.tmp.1927318.1777922479357",
+    "MOC.md.tmp.1927318.1777922467299",
+    "40-research/levelguard-analysis/README.md.tmp.1927318.1777922458817",
+    "40-research/swing-levels/tracker.md.tmp.1927318.1777922453837",
+    "40-research/swing-levels/tracker.md.tmp.1927318.1777922436759",
+    "40-research/breach-decision/pool-vs-baseline-2026-05-04.md.tmp.1927318.1777922428927",
+    "20-runbooks/breach-decision-stage-1-shadow-mode.md.tmp.1927318.1777922420909",
+    "20-runbooks/breach-decision-stage-1-shadow-mode.md.tmp.1927318.1777922408630",
+    "10-architecture/order-leg-classification.md.tmp.1927318.1777922400445",
+    "10-architecture/level-guard.md.tmp.1927318.1777922396728",
+    "10-architecture/level-guard.md.tmp.1927318.1777922390854",
+    "40-research/breach-decision/INDEX.md",
+    "40-research/breach-decision/pool-vs-baseline-2026-05-04.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-05-04-aud-0218-resume-design.md",
+    "80-claude-checkpoints/20260430-153140-d715ca2f-j9-tick-archive-automation-widened-daily.md",
+    "80-claude-checkpoints/20260430-153140-d715ca2f-pending.md",
+    "80-claude-checkpoints/20260430-152343-def3f248-aud-0008-fully-shipped-aud-0002-retry-fl.md",
+    "80-claude-checkpoints/20260430-152343-def3f248-pending.md",
+    "80-claude-checkpoints/20260430-105302-fedf9a7d-breach-training-data-overhaul-shipped-5.md",
+    "80-claude-checkpoints/20260430-105302-fedf9a7d-pending.md",
+    "80-claude-checkpoints/20260430-094733-140fa7f4-aud-0002-fully-shipped-4-commits-aud-000.md",
+    "80-claude-checkpoints/20260430-094733-140fa7f4-pending.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-26-aud-0002-0008-convergence-design.md",
+    "30-fixes-and-audits/audits/audit-autofix/AUDIT_TRACKER.md",
+    "10-architecture/order-leg-classification.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-30-aud-0227-phase3-design.md",
+    "80-claude-checkpoints/20260429-204505Z-a055b490-aud-0227-phase-1-phase-2-fully-shipped-e.md",
+    "80-claude-checkpoints/20260429-204505Z-a055b490-pending.md",
+    "80-claude-checkpoints/20260429-204413-45243889-day-4-close-8-audits-shipped-parallel-se.md",
+    "80-claude-checkpoints/20260429-204413-45243889-pending.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-29-aud-0381-tbe-rename-plan.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-29-aud-0227-0312-auth-epic-design.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-29-aud-0227-phase2-design.md",
+    "30-fixes-and-audits/audits/audit-autofix/2026-04-26-aud-0353-0354-security-runbook.md",
+    "80-claude-checkpoints/20260429-115114-eadc0033-campaign-2-day-3-29-auds-resolved-parall.md",
+    "80-claude-checkpoints/20260429-115114-eadc0033-pending.md"
+  ]
+}

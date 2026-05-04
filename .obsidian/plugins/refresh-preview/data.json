@@ -1,0 +1,11 @@
+{
+  "autoRefreshIntervalInSeconds": 5,
+  "autoRefreshMode": "AllOpenViews",
+  "excludeViewTypesForAutoRefresh": [],
+  "includeViewTypesForAutoRefresh": [],
+  "shouldAutoRefreshMarkdownViewInSourceMode": false,
+  "shouldAutoRefreshOnFileChange": true,
+  "shouldLoadDeferredViewsOnAutoRefresh": false,
+  "shouldLoadDeferredViewsOnStart": false,
+  "shouldUseQuickMarkdownViewRefresh": true
+}
