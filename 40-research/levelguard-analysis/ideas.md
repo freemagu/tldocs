@@ -1,5 +1,15 @@
 # LevelGuard / LevelMind — Improvement Ideas
 
+> Part of [[40-research/breach-decision/INDEX|breach-decision documentation]]
+
+> [!warning] Triage status: **un-triaged brainstorm** (as of 2026-05-04)
+> The ideas below have not been individually triaged into shipped / queued / dropped buckets. Treat this document as a working brainstorm, not as a backlog. When evaluating an idea here against current state:
+> 1. Cross-check against [[40-research/breach-decision/INDEX#current-state-facts-not-aspirations|INDEX §Current state]] to see if it has already shipped or moved.
+> 2. Cross-check against [[40-research/breach-decision/INDEX#deferred-decisions|INDEX §Deferred decisions]] to see if it has been considered and explicitly set aside.
+> 3. Cross-check against [[40-research/breach-decision/INDEX#open-threads--questions-for-the-external-researcher|INDEX §Open threads]] for the questions an external researcher would prioritise.
+>
+> An eventual triage pass would assign each idea a status tag (`shipped` / `queued` / `deferred` / `dropped`) with a one-line reason. Until then, ideas here may overlap with already-shipped work or with deferred decisions — read with that caveat.
+
 This document captures brainstorming and proposals for making LevelMind smarter at distinguishing genuine level breaks from wick rejections / stop hunts.
 
 **Core principle**: Candle closes alone are too simplistic. Real market structure — volume, CVD, open interest, order flow — tells you *why* price moved through a level. LevelMind should understand the mechanics, not just the price.

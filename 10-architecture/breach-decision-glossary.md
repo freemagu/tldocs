@@ -59,11 +59,21 @@ requires two sustained fails in opposite directions.
 The trade plan's `execute_when` field selects which level-outcome event
 fires the order:
 
-| Mode (config string) | Fires on | Status |
-|---|---|---|
-| `execute_when='fails'` | Level failed (= breach sustained) | Production |
-| `execute_when='holds'` | Level held (= breach rejected, OR approach rejected) | **B8** — planned |
-| `execute_when='reclaim'` | Reclaim event (second sustained breach in opposite direction) | **B9** — planned |
+| Mode (config string) | Fires on | Mode wired in `LevelMindCore`? | Predictor gate shipped? |
+|---|---|---|---|
+| `execute_when='fails'` | Level failed (= breach sustained) | ✅ Production | ⚠️ **B7** — shadow mode only; not wired to actual gate decisions |
+| `execute_when='holds'` | Level held (= breach rejected, OR approach rejected) | ✅ Production (default for limit orders) | ❌ **B8** — Phase 1 backtest done; Phase 2 gate not started |
+| `execute_when='reclaim'` | Reclaim event (second sustained breach in opposite direction) | ❌ **B9** — infrastructure exists (`level_reclaim_state` table, `reclaim_state.py`, `reclaim_persistence.py`); LevelMindCore wiring deferred | n/a — v1 plan fires immediately on second sustained breach without a predictor gate |
+
+> **Mode vs. gate distinction.** Each `B<n>` label in this codebase
+> refers to a **predictor gate** that decides "fire now vs. defer" at
+> the moment of breach for a given mode — *not* the mode itself. The
+> basic execute-mode plumbing (does the worker recognise this mode and
+> trigger an order on the right outcome?) is wired independently of
+> whether the predictor gate for that mode has been built. Holds-mode
+> orders work today; the holds-mode predictor gate (B8) does not. Same
+> distinction will apply to reclaim mode: B9's wiring is the mode
+> plumbing; the v1 plan does not include a predictor gate for it.
 
 ## Breach-decision gate (B7)
 
@@ -182,4 +192,4 @@ work must align with this glossary.
 - [[breach-decision-training]] — training pipeline
 - [[40-research/breach-decision/INDEX|Breach-decision index]] — Map of Content
 
-*Last reviewed: 2026-05-04 — back-links and wiki-links added; content verified current.*
+*Last reviewed: 2026-05-04 — back-links and wiki-links added; content verified current; execute-modes table split into "mode wired" vs. "predictor gate shipped" columns to remove conflation between mode plumbing and the B7/B8/B9 predictor gates.*

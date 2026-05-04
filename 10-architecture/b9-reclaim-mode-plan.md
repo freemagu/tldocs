@@ -2,9 +2,19 @@
 
 > Part of [[40-research/breach-decision/INDEX|breach-decision documentation]]
 
-> [!warning] Status: Designed, not implemented
-> This plan describes a fully-designed but not-yet-started feature. No code
-> has been written, no migration applied. Estimated effort: ~2 days end-to-end.
+> [!warning] Status: Infrastructure shipped; LevelMindCore wiring pending
+> The `level_reclaim_state` table, the pure-logic decision engine
+> (`reclaim_state.py`), and the DB persistence wrapper
+> (`reclaim_persistence.py`) all exist as of 2026-05-04. What remains is
+> wiring those modules into `LevelMindCore`'s breach hot path so that
+> `execute_when='reclaim'` orders fire on real breaches. Estimated remaining
+> effort: ~1 day.
+>
+> **Note on B-naming:** unlike B7 (fails-mode predictor gate) and B8
+> (holds-mode predictor gate), B9 in v1 does NOT include a predictor gate.
+> It fires immediately on the second sustained breach in the opposite
+> direction. A B9-with-gate variant could be designed later once a
+> labelled reclaim dataset accumulates.
 
 Architectural plan for the third execute mode. Refer to the
 [[breach-decision-glossary]] for the canonical definition of *reclaim*.
@@ -232,4 +242,4 @@ Estimated remaining effort: ~1 day (infrastructure exists; wiring is the remaini
 - `lib/tradelens/breach_decision/reclaim_state.py` — reclaim decision engine (already exists)
 - `lib/tradelens/breach_decision/reclaim_persistence.py` — DB wrapper (already exists)
 
-*Last reviewed: 2026-05-04 — status warning added; back-links and wiki-links added. Implementation not started.*
+*Last reviewed: 2026-05-04 — status warning corrected: infrastructure (table + decision engine + persistence wrapper) is shipped; LevelMindCore wiring is the remaining step (~1 day). Note added that B9 v1 does not include a predictor gate.*

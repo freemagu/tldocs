@@ -3,9 +3,17 @@
 > Part of [[40-research/breach-decision/INDEX|breach-decision documentation]]
 
 > [!warning] Status: Phase 1 complete; Phase 2 not started
-> Phase 1 backtest results are documented below. Phase 2 (actual gate implementation
-> in LevelMindCore) has not been started. It is gated on the Phase 1 evidence being
-> judged strong enough to justify the engineering.
+> Phase 1 backtest results are documented below. Phase 2 (the **predictor
+> gate** for holds mode) has not been started. It is gated on the Phase 1
+> evidence being judged strong enough to justify the engineering.
+>
+> **Important distinction:** `execute_when='holds'` mode itself is in
+> production today (default for limit orders, wired into `LevelMindCore`).
+> What B8 adds is a predictor gate — the holds-mode equivalent of B7's
+> fails-mode gate — that would decide *fire the limit now* vs. *defer
+> because the level looks like it might fail and a better fill is likely*.
+> Without B8, holds-mode orders fire immediately on the held condition;
+> with B8, they would optionally defer when the predictor expects a fail.
 
 The B8 holds-mode gate is the planned counterpart to B7's fails-mode
 gate. The strategy is:
@@ -242,4 +250,4 @@ These are deferred until Phase 2 begins.
 - Backtest CLI: `bin/holds-mode-backtest`
 - Classifier code: `lib/tradelens/breach_decision/holds_backtest/level_outcome.py`
 
-*Last reviewed: 2026-05-04 — status warning added; wiki-links added.*
+*Last reviewed: 2026-05-04 — status warning added; wiki-links added; status callout sharpened to make the mode-vs-gate distinction explicit (holds mode itself is in production; the predictor gate is what's pending).*

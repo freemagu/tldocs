@@ -36,8 +36,8 @@ The **breach-decision** project exists because TradeLens's [[level-guard|LevelGu
 | [[breach-decision-retraining-jobs]] | Operational cadence: when each pipeline stage should run (J1–J9), who acts on the output, thresholds and rationale. |
 | [[level-guard]] | LevelGuard state machine — the upstream system that generates breach events. Breach-decision sits inside LevelGuard's breach hot-path. |
 | [[order-leg-classification]] | How TradeLens classifies exchange orders into trade legs. Relevant for understanding what types of legs produce breach events. |
-| [[b9-reclaim-mode-plan]] | Architecture plan for `execute_when='reclaim'` (B9) — the third execute mode, designed but not implemented. Requires persistent per-level state across breach events. |
-| [[holds-mode-backtest]] | Backtest of the `execute_when='holds'` strategy (B8). Phase 1 results: 266 filled limit legs, 29% failed within 30 min at 1% tolerance, 68% of failed legs had price return to level within 4h. Phase 2 (actual gate) not started. |
+| [[b9-reclaim-mode-plan]] | Architecture plan for the `execute_when='reclaim'` mode wiring. Decision logic + persistent state already shipped (`level_reclaim_state` table, `reclaim_state.py`, `reclaim_persistence.py`); LevelMindCore wiring is the remaining step. The v1 plan does not include a predictor gate for reclaim — it fires immediately on the second sustained breach. |
+| [[holds-mode-backtest]] | Backtest of the `execute_when='holds'` predictor gate (B8). **Holds mode itself is in production** (default for limit orders); the predictor gate that would decide "fire-now vs. defer for a better fill" is what's pending. Phase 1 results: 266 filled limit legs, 29% failed within 30 min at 1% tolerance, 68% of failed legs returned to level within 4h. Phase 2 (gate implementation) not started. |
 
 ---
 
@@ -90,6 +90,9 @@ The canonical breach-research methodology guide lives at:
 
 This file is outside the Obsidian vault (it is a Claude Code slash-command definition). It cannot be wiki-linked but it exists and is the authoritative reference for how to set up the research environment, run the pipelines, and interpret results. Ask the human operator for a copy if needed.
 
+> [!note] Skill freshness — last formal audit predates 2026-05-04
+> The 697-line skill has not been audited against today's pipeline changes (chronological-split fix from `decided_at_utc` → `breach_ts_utc`, calibrator-collapse guard with `--allow-small-calibration-fold`, persisted `metrics` block in `artefact.json`, mode-vs-gate distinction). External readers using the skill as a reference should cross-check any methodology claim against the docs in this vault, which were refreshed on 2026-05-04 and are the more current source. A re-audit pass over the skill is queued and tracked under [[#deferred-decisions|Deferred decisions]] below.
+
 ---
 
 ## Current state (facts, not aspirations)
@@ -104,6 +107,7 @@ This file is outside the Obsidian vault (it is a Claude Code slash-command defin
 - Per-symbol models: `data/models/breach_decision/<sym_lower>/<version>/artefact.json`
 - Pool model: `data/models/breach_decision/_pool/pool-7sym-2026-05-04/artefact.json` — trained under the pre-fix split (see methodology caveat above); to use for promotion, re-train under the fixed split first.
 - Pre-2026-05-04 artefacts may not have a `metrics` key in their `artefact.json` (the persistence side-fix shipped 2026-05-04). Consumers use `.get('metrics', {})`-style access; no breakage.
+- **Currently wired to production** (`etc/config.yml` → `breach_decision.model_version_<sym>`): `lr-btcusdt-2026-04-25-v1`, `lr-ethusdt-2026-04-25-v1`. Today's pool and `*-baseline-2026-05-04` artefacts are research-only; nothing trained on 2026-05-04 has been promoted. Promotion requires (a) re-training under the post-fix split and (b) editing the config + `tl restart level-mind`.
 
 **Pipeline:**
 - Label backfill: `bin/server/breach_decision_label_backfill.py` — running; populates `realised_safe_*` columns.
@@ -113,9 +117,12 @@ This file is outside the Obsidian vault (it is a Claude Code slash-command defin
 - Retrain trigger CLI: `bin/breach-decision-retrain-trigger` — checks `min_ok_rows` and `min_age_days` thresholds before recommending a retrain.
 
 **What is NOT implemented:**
-- B7 gate actually wired to delay LevelGuard decisions (shadow mode only).
-- B8 holds-mode gate (Phase 2 pending; [[holds-mode-backtest|Phase 1 results]] available).
-- B9 reclaim mode (designed in [[b9-reclaim-mode-plan]]; not started).
+
+> Each `B<n>` is a **predictor gate** that decides fire-now vs. defer at the moment of breach. The basic execute-mode wiring (does the worker recognise the mode and trigger an order on the right outcome?) is independent. See [[breach-decision-glossary#execute-modes]] for the full mode/gate matrix.
+
+- **B7 gate** — shadow mode only; not yet wired to actual `fails`-mode gate decisions. (`fails` mode itself is in production.)
+- **B8 gate** — Phase 2 not started. [[holds-mode-backtest|Phase 1 results]] available; gate implementation pending. (`holds` mode itself is in production and is the default for limit orders.)
+- **B9 wiring** — reclaim-mode infrastructure exists (table, decision engine, persistence wrapper); LevelMindCore wiring is the remaining step. The v1 plan does not include a predictor gate for reclaim.
 - Auto-promotion of trained models to production.
 
 ---
@@ -140,8 +147,23 @@ The following are concrete open questions where external perspective would be mo
 
 ---
 
+## Deferred decisions
+
+Decisions that were considered, weighed, and explicitly deferred — recorded so that future sessions don't re-litigate the same ground without new evidence, and so an external reviewer can see what was on the table and why it was set aside.
+
+| Decision | Status | Reason | Re-open trigger |
+|---|---|---|---|
+| **Widen training pool to 30–50 symbols** | Deferred | Empirical evidence from the 2026-05-04 pool-vs-baseline comparison shows Brier barely moved as row count went from 70 (ASTERUSDT) → 200 (HYPEUSDT) → 598 (BTCUSDT) → 1712 (pool). If features had real signal, more rows would help — they don't, suggesting the feature set is the bottleneck, not the row count. | A feature-engineering experiment shows ≥0.02 Brier improvement on a single symbol at current row counts. That validates the feature carries signal and would justify the row-count multiplication. |
+| **Extend tick history backward (BTC/ETH to 2024 / earlier)** | Deferred | Same reason as above. Adding more rows of the same shape probably won't help; new context features (level-touch history, regime, proximity-to-next-level, order-book microstructure) are the higher-leverage move. | Same as above — feature-engineering gain validated first. |
+| **Add new synthetic level generators (round-numbers, MAs, prior-day H/L, ORB, VWAP)** | Deferred | Each generator is a few hours of work but increases breach-event diversity in unknown ways. Adding before we understand whether the existing dataset suffices for feature engineering is premature. | After feature engineering establishes a working baseline, add one new generator and measure whether a model trained on the union beats the single-generator baseline. |
+| **B9 reclaim-mode LevelMindCore wiring** | Deferred | Infrastructure (table, decision engine, persistence wrapper) is already shipped (~1 day of wiring left). Real production data shows zero levels have been breached twice in opposite directions — the strategy has no observed instances yet. No `execute_when='reclaim'` orders exist. | (a) Trader places a `reclaim`-mode order, OR (b) historical analysis on synthetic datasets finds ≥30 reclaim instances over the past 6 months, OR (c) breach-decision model matures enough that B9 becomes the natural next extension. See [[b9-reclaim-mode-plan]] for the full design. |
+| **Promote pool-7sym to production** | Deferred | The 2026-05-04 pool model was trained under the broken `decided_at_utc` chronological split (fixed same-day in `ab4c1910`). The reported metrics are not valid for promotion. Re-training under the post-fix split is required first. | A post-fix re-training run produces metrics that survive a real out-of-sample evaluation (per Open thread #4). |
+| **Re-audit `/breach-research` skill against today's changes** | Queued | The 697-line methodology guide hasn't been reviewed against today's pipeline updates (split fix, calibrator guard, persisted metrics, mode-vs-gate distinction). External readers may pick up stale claims. | Next time someone needs to update the skill for any reason, do a full pass simultaneously. Or schedule a one-off audit when no urgent work is in flight. |
+
+---
+
 ## Link topology
 
 Every architecture doc and the shadow-mode runbook has a back-link to this index. The swing-levels tracker links here. The levelguard-analysis README links here. All cross-references use Obsidian wiki-links.
 
-*Last reviewed: 2026-05-04 — created as Map of Content for external-AI ingest; refreshed same-day to incorporate fork-child code fixes (commits `ab4c1910`, `749f0f5f`, `786165c5`): chronological-split fix (`breach_ts_utc`), calibrator-collapse guard, additional case-insensitive symbol sites, GLMUSDT decision closed.*
+*Last reviewed: 2026-05-04 — created as Map of Content for external-AI ingest; refreshed same-day to incorporate fork-child code fixes (commits `ab4c1910`, `749f0f5f`, `786165c5`): chronological-split fix (`breach_ts_utc`), calibrator-collapse guard, additional case-insensitive symbol sites, GLMUSDT decision closed; mode-vs-gate distinction sharpened in the B7/B8/B9 listings; explicit production wiring noted in §Models; skill freshness flag added; Deferred decisions table introduced to capture considered-and-set-aside choices with re-open triggers.*
