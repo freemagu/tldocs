@@ -2,6 +2,11 @@
 
 > Part of [[INDEX|breach-decision documentation]] | **Frozen result — do not modify content**
 
+> [!warning] These metrics were computed under a broken chronological split — do not use for promotion decisions.
+> The training pipeline at the time of this run sorted rows by `decided_at_utc` (when the row was ingested into `breach_decision_log`). Because 6 of 7 symbols had their entire history bulk-ingested in a ~5-minute window on 2026-04-30, the chronological split was effectively random for those symbols. The test fold did NOT represent unseen-future breaches.
+>
+> The split was fixed later the same day to use `breach_ts_utc` (real market time of the breach) — see commit `ab4c1910`. Any promotion decision that uses these metrics must first re-train under the post-fix split. Numbers below are retained as a historical record of how the model was evaluated at the time, not as a current basis for promotion.
+
 **Date:** 2026-05-04  
 **Commit:** see repo (feat(breach_decision): pooled-symbol training + persisted metrics)  
 **Hyperparameters (all models):** train_frac=0.70, calibration_frac=0.15, lr_C=1.0

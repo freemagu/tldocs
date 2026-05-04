@@ -32,8 +32,7 @@ Retraining is end-to-end:
 1. **Data assembly** — pull rows from ``breach_decision_log``, join
    ground-truth labels (did price reclaim within 15 / 30 / 60 / 180 s
    of breach?), and produce a feature/label matrix.
-2. **Walk-forward CV** — split chronologically, never randomly.
-   Random split leaks future information into training.
+2. **Walk-forward CV** — split chronologically by `breach_ts_utc` (the real market time of the breach), never randomly and never by `decided_at_utc` (the ingest time, which is bunched for bulk-ingested data and effectively random when used as a sort key). Random or ingest-time splits leak future information into training. The `decided_at_utc` field is retained on the dataset for audit purposes only.
 3. **Per-target LR fit** — one logistic regression per
    ``p_safe_delay_*s`` head.
 4. **Calibration** — fit isotonic regression on a held-out window
@@ -158,11 +157,15 @@ As of 2026-05-04:
 - The first real training run (pool + per-symbol baselines) was completed 2026-05-04;
   see [[pool-vs-baseline-2026-05-04]] for results.
 
-**Key caveat on today's training run:** all 1712 pool rows were ingested in a ~3-day window
-(2026-04-27 → 2026-04-30). The chronological train/test split is effectively random for 6
-of 7 symbols. Treat today's metrics as in-sample-ish approximations, not robust out-of-sample
-estimates. A real validation window requires data from at least 30 days of organic breach
-events with independent timing.
+**Key caveat on the 2026-05-04 training run** *(historical — fix shipped same day)*:
+all 1712 pool rows were ingested in a ~3-day window (2026-04-27 → 2026-04-30) and the
+training pipeline at that time sorted rows by `decided_at_utc`, making the chronological
+split effectively random for 6 of 7 symbols. The reported metrics in
+[[pool-vs-baseline-2026-05-04]] are therefore in-sample-ish approximations and should not
+be used to make promotion decisions. The split was fixed in commit `ab4c1910` (same day,
+post-comparison) to sort by `breach_ts_utc`. Future training runs are genuine
+out-of-sample. To use any pool-vs-baseline numbers for promotion, re-train under the new
+split first.
 
 ## Calibration for small folds
 
@@ -172,6 +175,12 @@ for several per-symbol baselines. This is expected statistical behaviour, not a 
 
 The pool model (n_calib=256) does not collapse. This is the main operational argument
 for pool stability over per-symbol at this data volume.
+
+**Calibrator-collapse guard (shipped 2026-05-04, commit `ab4c1910`):** the trainer now
+warns at `n_calib < 50` and errors at `n_calib < 20`. Operators who deliberately want
+to train under a small calibration fold can override with the
+`--allow-small-calibration-fold` CLI flag, but this is intended for diagnostic runs,
+not for producing models that go into production.
 
 **Open question:** would Platt scaling (logistic calibration) or beta calibration
 handle small folds more gracefully? This is not evaluated yet. See the

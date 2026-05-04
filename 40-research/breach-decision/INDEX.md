@@ -11,7 +11,8 @@ The **breach-decision** project exists because TradeLens's [[level-guard|LevelGu
 - **Training pipeline shipped** — end-to-end code exists: label-build → train → calibrate → write artefact → metrics persisted to `artefact.json`.
 - **Predictive lift over base rate: weak** — pool model calibrated Brier ≈ 0.26–0.27 across all four targets (realised reclaim within 15/30/60/180 s). Base rate Brier ≈ 0.25 (predict the class prior). The gap is real but narrow.
 - **Pool beats per-symbol** — on stability grounds only; 5 of 7 per-symbol calibrators collapsed on small calibration folds. Pool is the more reliable choice, not the more accurate one.
-- **Critical methodological caveat** — 6 of 7 symbols had `decided_at_utc` compressed into a ~3-day bulk-ingest window (2026-04-27 → 2026-04-30). The chronological train/test split is effectively random for those symbols. Out-of-sample claims are weak.
+- **Methodology fix shipped same day (commit `ab4c1910`)** — the chronological split previously sorted rows by `decided_at_utc` (ingest time), which collapsed to ~5 minutes for 6 of 7 symbols, making the split effectively random. The split now sorts by `breach_ts_utc` (real market time of the breach). The 2026-05-04 [[pool-vs-baseline-2026-05-04|pool-vs-baseline metrics]] were computed under the broken split and should be regenerated post-fix before being used to make promotion decisions.
+- **Calibrator-collapse guard shipped same day (commit `ab4c1910`)** — trainer now warns at `n_calib < 50` and errors at `n_calib < 20`. Override via `--allow-small-calibration-fold` for diagnostic runs only. Future runs with small per-symbol calibration folds will be flagged before producing broken models, instead of silently emitting them.
 - **Feature set is the suspected bottleneck** — adding more rows of the same shape probably will not help. The research hypothesis (see §Open threads) is that new *context* features (level-touch history, regime, proximity-to-next-level, order-flow microstructure) are the higher-leverage move.
 - **B7 gate is in shadow mode** — [[breach-decision-stage-1-shadow-mode|shadow-mode runbook]] documents how to run the predictor observation-only. Not yet wired to actual gate decisions.
 - **Pool promotion pending** — the 2026-05-04 report recommends promoting pool but notes the caveat above; promotion has not happened yet.
@@ -101,8 +102,8 @@ This file is outside the Obsidian vault (it is a Claude Code slash-command defin
 
 **Models:**
 - Per-symbol models: `data/models/breach_decision/<sym_lower>/<version>/artefact.json`
-- Pool model: `data/models/breach_decision/_pool/pool-7sym-2026-05-04/artefact.json`
-- The pool model is the only one trained on 2026-05-04 data with persisted metrics.
+- Pool model: `data/models/breach_decision/_pool/pool-7sym-2026-05-04/artefact.json` — trained under the pre-fix split (see methodology caveat above); to use for promotion, re-train under the fixed split first.
+- Pre-2026-05-04 artefacts may not have a `metrics` key in their `artefact.json` (the persistence side-fix shipped 2026-05-04). Consumers use `.get('metrics', {})`-style access; no breakage.
 
 **Pipeline:**
 - Label backfill: `bin/server/breach_decision_label_backfill.py` — running; populates `realised_safe_*` columns.

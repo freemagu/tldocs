@@ -52,9 +52,19 @@ mv /var/tmp/retrain-trigger.today.json /var/tmp/retrain-trigger.yesterday.json
 | Status | **Available today** — first run completed 2026-05-04 |
 | Cadence | Triggered by J1 (or manual) |
 | Command | `breach-decision-train --symbol <SYM> --version <version>` or `--pool S1,S2,...` |
-| Prereq | Labelled rows in `breach_decision_log` (min 200 by default, tunable) |
-| Output | New artefact at `data/models/breach_decision/<sym>/<version>/artefact.json` (per-symbol) or `data/models/breach_decision/_pool/<version>/artefact.json` (pool) |
+| Prereq | Labelled rows in `breach_decision_log` (min 200 by default, tunable via `--min-rows`) |
+| Output | New artefact at `data/models/breach_decision/<sym>/<version>/artefact.json` (per-symbol) or `data/models/breach_decision/_pool/<version>/artefact.json` (pool). Includes a persisted `metrics` block per target (since 2026-05-04). |
 | Operator action | J3 review, then J4 promotion |
+
+**CLI flags worth knowing:**
+
+- `--symbol <SYM>` and `--pool S1,S2,...` are mutually exclusive — pick one.
+- `--min-rows <N>` lowers the labelled-row floor (default 200). Useful for
+  small-symbol diagnostic runs.
+- `--allow-small-calibration-fold` — bypasses the calibrator-collapse guard.
+  By default the trainer **warns** at `n_calib < 50` and **errors** at
+  `n_calib < 20`; this flag suppresses both. Intended for diagnostic runs only.
+  Models produced with this flag should not be promoted.
 
 Don't auto-run on a calendar — only when J1 says `retrain`. A
 calendar-driven retrain risks shipping a model fitted on too few
