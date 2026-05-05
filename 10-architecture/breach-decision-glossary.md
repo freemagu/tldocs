@@ -152,6 +152,20 @@ guards are created, not at the breach hot path. The legacy
 `breach_decision_log.hard_stop_confirmed` column was dropped in
 migration 089.
 
+## Statistics terms
+
+| Term | Meaning |
+|---|---|
+| **Breach rejection rate (within Xs)** | The empirical proportion of breaches that were rejected (= level held) within X seconds of the breach event. One value per target window: 15s / 30s / 60s / 180s. Equal to the `realised_safe_*s` column's mean over the dataset. The artefact JSON stores this per-target as the field `base_rate` — same number, generic ML name. As of 2026-05-04: ≈ 0.45 / 0.50 / 0.54 / 0.64 across the four windows. |
+| **Base rate** | Generic statistics / ML term for the proportion of positive cases in any binary classification dataset. In our system, "base rate of `realised_safe_30s`" and "30-second breach rejection rate" refer to the same number. Use *breach rejection rate* in domain text; *base rate* is fine in ML-flavoured discussion. |
+| **No-information baseline** | The constant-output "model" that ignores all features and predicts the breach rejection rate as a fixed probability for every breach. Not a real predictor — it's just the historical frequency emitted on every input. Used as the floor any real model must beat: a model that scores worse than the no-information baseline on Brier or log-loss is contributing zero (or negative) information beyond the prior. Sometimes called "base-rate predictor" in ML literature. |
+
+> **Why these terms matter for evaluation.** Brier and log-loss scores are
+> scale-dependent: a Brier of 0.25 on a 50/50 problem is uninformative,
+> while a Brier of 0.09 on a 90/10 problem looks impressive but is also
+> uninformative (the no-information baseline scores 0.09 on 90/10 too).
+> Always report the no-information baseline alongside the model's score.
+
 ## Direction terms
 
 | Term | Meaning |
@@ -192,4 +206,4 @@ work must align with this glossary.
 - [[breach-decision-training]] — training pipeline
 - [[40-research/breach-decision/INDEX|Breach-decision index]] — Map of Content
 
-*Last reviewed: 2026-05-04 — back-links and wiki-links added; content verified current; execute-modes table split into "mode wired" vs. "predictor gate shipped" columns to remove conflation between mode plumbing and the B7/B8/B9 predictor gates.*
+*Last reviewed: 2026-05-05 — added Statistics terms section defining "breach rejection rate (within Xs)", "base rate" (as the ML synonym), and "no-information baseline" (the constant-output benchmark). Earlier 2026-05-04: back-links and wiki-links; execute-modes table split into "mode wired" vs. "predictor gate shipped" columns.*

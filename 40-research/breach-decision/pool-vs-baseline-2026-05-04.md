@@ -35,6 +35,8 @@
 
 ## 2. Per-Target Metrics
 
+> The `base_rate` column matches the artefact JSON field name and is what the [[breach-decision-glossary#statistics-terms|no-information baseline]] would output as its constant prediction for that target. In domain text you may also see this same number called the **breach rejection rate (within Xs)**.
+
 ### Target: safe_delay_15s (reclaim within 15 seconds)
 
 | Model | base_rate | log_loss_cal | brier_cal |
